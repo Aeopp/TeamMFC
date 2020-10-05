@@ -71,6 +71,8 @@ void CollisionTileManager::DebugRender()&
 	constexpr float DebugLineWidth = 2.f;
 
 	std::pair<float, float > CameraPos{ 0.f,0.f }; 
+	float JoomScale = 1.f;
+	matrix MJoom;
 
 	#ifdef _AFX
 		CMainFrame*pMain = dynamic_cast<CMainFrame*>(AfxGetApp()->GetMainWnd());
@@ -80,12 +82,18 @@ void CollisionTileManager::DebugRender()&
 
 		CameraPos.first = pView->GetScrollPos(0);
 		CameraPos.second = pView->GetScrollPos(1);
+
+		JoomScale = pView->JoomScale;
+
 	#endif
 
 	GraphicDevice::instance().GetSprite()->End();
 	GraphicDevice::instance().GetLine()->SetWidth(DebugLineWidth);
 
 	uint32_t RenderCount = 0;
+
+	MJoom = math::GetCameraJoomMatrix(JoomScale,
+		vec3{ global::ClientSize.first,global::ClientSize.second,0.f });
 
 	for (const auto& CollisionTilePoints : _CollisionTilePointsMap[CurrentStateKey])
 	{
@@ -98,7 +106,9 @@ void CollisionTileManager::DebugRender()&
 										CollisionTilePoints[i].y - CameraPos.second };
 
 			vec3 Point3D = { CollisionTilePoints2D[i].x, CollisionTilePoints2D[i].y, 0.f };
-
+			D3DXVec3TransformCoord(&Point3D, &Point3D, &MJoom);
+			CollisionTilePoints2D[i].x = Point3D.x;
+			CollisionTilePoints2D[i].y = Point3D.y;
 			IsRenderable |= math::IsPointInnerRect(global::GetScreenRect(), Point3D);
 		}
 		CollisionTilePoints2D.back() = CollisionTilePoints2D.front();

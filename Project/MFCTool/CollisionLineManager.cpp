@@ -40,7 +40,8 @@ void CollisionLineManager::DebugRender()  &
 	constexpr auto DebugLineColor = D3DCOLOR_ARGB(255, 0, 0, 255);
 
 	std::pair<float, float > CameraPos{ 0.f,0.f };
-
+	float JoomScale = 1.f;
+	matrix MJoom;
 #ifdef _AFX
 	CMainFrame*pMain = dynamic_cast<CMainFrame*>(AfxGetApp()->GetMainWnd());
 	if (!pMain)return;
@@ -49,11 +50,14 @@ void CollisionLineManager::DebugRender()  &
 
 	CameraPos.first = pView->GetScrollPos(0);
 	CameraPos.second = pView->GetScrollPos(1);
+	JoomScale = pView->JoomScale;
 #endif
 	GraphicDevice::instance().GetSprite()->End();
 	GraphicDevice::instance().GetLine()->SetWidth(DebugLineWidth);
 
-	
+
+	MJoom = math::GetCameraJoomMatrix(JoomScale, vec3{ global::ClientSize.first,
+		global::ClientSize.second,0.f });
 	uint32_t RenderCount = 0;
 
 	const auto& CurrentCollisionLineVec = _CollisionLineMap[CurrentStateKey];
@@ -67,7 +71,10 @@ void CollisionLineManager::DebugRender()  &
 
 		Line2Ds[1] = { CollisionLine.second.x - CameraPos.first,
 			CollisionLine.second.y - CameraPos.second };
-		
+
+		D3DXVec2TransformCoord(&Line2Ds[0], &Line2Ds[0], &MJoom);
+		D3DXVec2TransformCoord(&Line2Ds[1], &Line2Ds[1], &MJoom);
+
 		bool IsRenderable = false;
 
 		IsRenderable |= math::IsPointInnerRect(global::GetScreenRect(), vec3{ Line2Ds[0].x,Line2Ds[0].y,0.f });
