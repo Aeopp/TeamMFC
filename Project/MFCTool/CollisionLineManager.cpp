@@ -10,13 +10,15 @@
 
 void CollisionLineManager::Push(std::pair<vec3, vec3> Line) &
 {
-	_CollisionLineVec.push_back(std::move(Line));
+	_CollisionLineMap[CurrentStateKey].push_back(std::move(Line));
 }
 
 void CollisionLineManager::Erase(const vec3 & TargetPosition) &
 {
-	 auto IsFindIter = std::find_if(std::begin(_CollisionLineVec),
-								   std::end(_CollisionLineVec),
+	auto& CurrentCollisionLineVec = _CollisionLineMap[CurrentStateKey];
+
+	 auto IsFindIter = std::find_if(std::begin(CurrentCollisionLineVec),
+								   std::end(CurrentCollisionLineVec),
 		[TargetPosition](const auto& CollisionLine)
 	{
 		constexpr float DistanceMin = 20.f;
@@ -26,16 +28,16 @@ void CollisionLineManager::Erase(const vec3 & TargetPosition) &
 				DistanceMin > math::GetPointDistance({ TargetPosition,CollisionLine.second }));
 	});
 
-	if (IsFindIter != _CollisionLineVec.end())
-		_CollisionLineVec.erase(IsFindIter);
+	if (IsFindIter != std::end(CurrentCollisionLineVec))
+		CurrentCollisionLineVec.erase(IsFindIter);
 }
 
-void CollisionLineManager::DebugRender() const &
+void CollisionLineManager::DebugRender()  &
 {
 	if (!global::bDebug)return;
 
 	constexpr float DebugLineWidth = 3.f;
-	constexpr auto DebugLineColor = D3DCOLOR_ARGB(255, 86, 100, 255);
+	constexpr auto DebugLineColor = D3DCOLOR_ARGB(255, 0, 0, 255);
 
 	std::pair<float, float > CameraPos{ 0.f,0.f };
 
@@ -53,8 +55,10 @@ void CollisionLineManager::DebugRender() const &
 
 	
 	uint32_t RenderCount = 0;
-	
-	for (const auto& CollisionLine : _CollisionLineVec)
+
+	const auto& CurrentCollisionLineVec = _CollisionLineMap[CurrentStateKey];
+
+	for (const auto& CollisionLine : CurrentCollisionLineVec)
 	{
 		std::array<vec2, 2> Line2Ds;
 
@@ -81,7 +85,7 @@ void CollisionLineManager::DebugRender() const &
 	RECT rectRender{ 0,100,500,125 };
 	GraphicDevice::instance().GetFont()->DrawTextW(nullptr, DebugTileStr.c_str(), DebugTileStr.size(), &rectRender, 0, D3DCOLOR_ARGB(255, 109, 114, 255));
 
-	DebugTileStr = L"CullingRenderDebugLine : " + std::to_wstring(_CollisionLineVec.size() - RenderCount);
+	DebugTileStr = L"CullingRenderDebugLine : " + std::to_wstring(CurrentCollisionLineVec.size() - RenderCount);
 	rectRender = { 0,125,500,150};
 	GraphicDevice::instance().GetFont()->DrawTextW(nullptr, DebugTileStr.c_str(), DebugTileStr.size(), &rectRender, 0, D3DCOLOR_ARGB(255, 109, 114, 255));
 
@@ -94,14 +98,16 @@ void CollisionLineManager::LoadCollisionLine(const std::wstring & FilePath) &
 	size_t _InfoSize{};
 	file_output >> _InfoSize;
 
+	 auto& CurrentCollisionLineVec = _CollisionLineMap[CurrentStateKey];
+
 	for (size_t i = 0; i < _InfoSize; ++i)
 	{
-		decltype(_CollisionLineVec)::value_type _CollisionLine;
+		typename std::decay_t<decltype(CurrentCollisionLineVec)>::value_type _CollisionLine;
 
 		file_output >> _CollisionLine.first; 
 		file_output >> _CollisionLine.second;
 
-		_CollisionLineVec.push_back(std::move(_CollisionLine));
+		CurrentCollisionLineVec.push_back(std::move(_CollisionLine));
 	}
 }
 
@@ -109,11 +115,13 @@ void CollisionLineManager::SaveCollisionLine(const std::wstring & FilePath) &
 {
 	std::wofstream file_Input(FilePath);
 
-	size_t _InfoSize = _CollisionLineVec.size();
+	const auto& CurrentCollisionLineVec = _CollisionLineMap[CurrentStateKey];
+
+	size_t _InfoSize = CurrentCollisionLineVec.size();
 
 	file_Input << _InfoSize << std::endl;
 
-	for (const auto& CollisionLine : _CollisionLineVec)
+	for (const auto& CollisionLine : CurrentCollisionLineVec)
 	{
 		file_Input << CollisionLine.first;
 		file_Input << CollisionLine.second;
@@ -122,5 +130,5 @@ void CollisionLineManager::SaveCollisionLine(const std::wstring & FilePath) &
 
 void CollisionLineManager::Clear() &
 {
-	_CollisionLineVec.clear();
+	_CollisionLineMap.clear();
 }

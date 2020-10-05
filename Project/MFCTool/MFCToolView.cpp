@@ -19,6 +19,7 @@
 #include "MainFrm.h"
 #include "MiniView.h"
 #include "MyForm.h"
+#include <mutex>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
