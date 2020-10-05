@@ -120,55 +120,55 @@ void CMapTool::OnLbnSelchangePicture()
 	if (!pView->up_Terrain)return;
 
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	UpdateData(TRUE); 
-	CString CurrentSelectName = L""; 
+	UpdateData(TRUE);
+	CString CurrentSelectName = L"";
 	// 제로인덱스부터 시작하는 리스트 박스의 현재 선택한 인덱스입니다 (파일명과 혼동하지 마세요..)
-	int32_t SelectFileIndex = _ListBox.GetCurSel(); 
+	int32_t SelectFileIndex = _ListBox.GetCurSel();
 
 	if (LB_ERR == SelectFileIndex)
-		return; 
+		return;
 
 	// 리스트박스의 현재선택 인덱스로부터 문자열을 얻어옵니다.
-	_ListBox.GetText(SelectFileIndex, CurrentSelectName); 
+	_ListBox.GetText(SelectFileIndex, CurrentSelectName);
 
 	// 파일명중 숫자만 남기기 위해 추적합니다.
-	int i = 0; 
-	for (; i < CurrentSelectName.GetLength(); ++i)
+	int32_t i = CurrentSelectName.GetLength() - 1;
+	for (; i >= 0; --i)
 	{
-		if(isdigit(CurrentSelectName[i]))
+		if (false == isdigit(CurrentSelectName[i]))
 			break;
 	}
 	// 해당 작업 이후 파일명에서 숫자만 남습니다.
-	CurrentSelectName.Delete(0,i);
+	CurrentSelectName.Delete(0, i);
 
 	// 숫자 문자열을 실제 정수로 변환합니다.
-	_DrawID = _wtoi(CurrentSelectName.GetString()); 
+	_DrawID = _wtoi(CurrentSelectName.GetString());
 
 	GraphicDevice::instance().RenderBegin();
 
-	matrix MScale, MTranslation, MWorld; 
+	matrix MScale, MTranslation, MWorld;
 	auto sp_TexInfo = Texture_Manager::instance().
-	Get_TexInfo(L"Map", pView->up_Terrain->CurrentTileTextureStateKey, _DrawID);
+		Get_TexInfo(L"Map", pView->up_Terrain->CurrentTileTextureStateKey, _DrawID);
 
 	if (nullptr == sp_TexInfo)
-		return; 
+		return;
 
 	float CenterX = sp_TexInfo->ImageInfo.Width >> 1;
 	float CenterY = sp_TexInfo->ImageInfo.Height >> 1;
 
 	const float ClientSizeX = global::ClientSize.first;
-	const float ClientSizeY = global::ClientSize.second; 
+	const float ClientSizeY = global::ClientSize.second;
 
-	D3DXMatrixTranslation(&MTranslation, 
+	D3DXMatrixTranslation(&MTranslation,
 		ClientSizeX* 0.5f,
-		ClientSizeY *0.5f,0.f);
+		ClientSizeY *0.5f, 0.f);
 
 	float SizeX = ClientSizeX / float(sp_TexInfo->ImageInfo.Width);
 	float SizeY = ClientSizeY / float(sp_TexInfo->ImageInfo.Height);
 
 	D3DXMatrixScaling(&MScale, SizeX*SelectPictureViewScale, SizeY*SelectPictureViewScale, 0.f);
 
-	MWorld = MScale * MTranslation; 
+	MWorld = MScale * MTranslation;
 
 	auto& _GraphicDeviceRef = GraphicDevice::instance();
 
@@ -179,7 +179,7 @@ void CMapTool::OnLbnSelchangePicture()
 
 	_GraphicDeviceRef.RenderEnd(_Picture.GetSafeHwnd());
 
-	UpdateData(FALSE); 
+	UpdateData(FALSE);
 }
 
 
