@@ -84,7 +84,6 @@ void CollisionTileManager::DebugRender()&
 		CameraPos.second = pView->GetScrollPos(1);
 
 		JoomScale = pView->JoomScale;
-
 	#endif
 
 	GraphicDevice::instance().GetSprite()->End();

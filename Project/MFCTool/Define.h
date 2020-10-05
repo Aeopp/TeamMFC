@@ -8,7 +8,7 @@ public:
 	static constexpr std::pair<float, float > ClientSize = { 1920 ,1080 };
 	static constexpr std::pair<float, float > TileNums = { 100 ,100 };
 	static constexpr std::pair<float, float > TileSize = { 32 ,32 };
-	static constexpr float ClientViewMinLeftTop = 750.f;
+	static constexpr int32_t ClientViewMinLeftTop = (int32_t(((ClientSize.first + ClientSize.second) / 3.7f) / 32)) *TileSize.first;
 	static std::array<vec3, 4ul> GetScreenRect();
 	
 	static HWND hWND;
