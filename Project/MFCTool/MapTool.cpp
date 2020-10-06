@@ -159,7 +159,7 @@ void CMapTool::OnLbnSelchangePicture()
 			break;
 	}
 	// 해당 작업 이후 파일명에서 숫자만 남습니다.
-	CurrentSelectName.Delete(0, i);
+	CurrentSelectName.Delete(0, i+1);
 
 	// 숫자 문자열을 실제 정수로 변환합니다.
 	_DrawID = _wtoi(CurrentSelectName.GetString());

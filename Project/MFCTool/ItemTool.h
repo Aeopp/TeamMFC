@@ -25,7 +25,6 @@ protected:
 	//DECLARE_DISPATCH_MAP()
 	//DECLARE_INTERFACE_MAP()
 public:
-	CListBox m_ListBox;
 	int m_iDrawID;
 	afx_msg void OnLbnSelchangeItemList1();
 	CListBox _ListBox;
@@ -33,7 +32,6 @@ public:
 	int _DrawID{ 0 };
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	void HorizontalScroll();
-
 private:
 	class CMFCToolView*   GetView()const&;
 };

@@ -17,8 +17,6 @@ CItemTool::CItemTool(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_ITEMTOOL, pParent)
 {
 	m_iDrawID = 0;
-
-
 }
 
 CItemTool::~CItemTool()
@@ -60,8 +58,7 @@ void CItemTool::OnDropFiles(HDROP hDropInfo)
 		strFileNameAndExtant = PathFindFileName(strReletivePath);
 		lstrcpy(szFileName, strFileNameAndExtant.GetString());
 		PathRemoveExtension(szFileName);
-		m_ListBox.AddString(szFileName);
-
+		_ListBox.AddString(szFileName);
 	}
 
 	HorizontalScroll();
@@ -97,6 +94,7 @@ void CItemTool::HorizontalScroll()
 
 void CItemTool::OnLbnSelchangeItemList1()
 {
+
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	constexpr float SelectPictureViewScale = 0.9f;
 
@@ -123,7 +121,7 @@ void CItemTool::OnLbnSelchangeItemList1()
 			break;
 	}
 	// 해당 작업 이후 파일명에서 숫자만 남습니다.
-	CurrentSelectName.Delete(0, i);
+	CurrentSelectName.Delete(0, i+1);
 
 	// 숫자 문자열을 실제 정수로 변환합니다.
 	_DrawID = _wtoi(CurrentSelectName.GetString());
@@ -132,7 +130,7 @@ void CItemTool::OnLbnSelchangeItemList1()
 
 	matrix MScale, MTranslation, MWorld;
 	auto sp_TexInfo = Texture_Manager::instance().
-		Get_TexInfo(L"Item", pView->up_Terrain->CurrentTileTextureStateKey, _DrawID);
+		Get_TexInfo(L"Item",L"Item1", _DrawID);
 
 	if (nullptr == sp_TexInfo)
 		return;
