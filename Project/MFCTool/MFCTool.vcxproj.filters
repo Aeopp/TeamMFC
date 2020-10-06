@@ -123,7 +123,6 @@
     <ClInclude Include="MapTool.h">
       <Filter>00.View\Form\MapTool</Filter>
     </ClInclude>
-    <ClInclude Include="FileInfo.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="singleton_interface.h" />
     <ClInclude Include="CollisionTileManager.h" />
@@ -136,6 +135,9 @@
     </ClInclude>
     <ClInclude Include="MFCToolView.h">
       <Filter>00.View</Filter>
+    </ClInclude>
+    <ClInclude Include="FileInfo.h">
+      <Filter>FileInfo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -184,7 +186,6 @@
     <ClCompile Include="MapTool.cpp">
       <Filter>00.View\Form\MapTool</Filter>
     </ClCompile>
-    <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="singleton_interface.cpp" />
     <ClCompile Include="Define.cpp" />
@@ -195,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="Item.cpp">
       <Filter>Item</Filter>
+    </ClCompile>
+    <ClCompile Include="FileInfo.cpp">
+      <Filter>FileInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

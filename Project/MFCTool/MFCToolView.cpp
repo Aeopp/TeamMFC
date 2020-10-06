@@ -249,6 +249,9 @@ void CMFCToolView::OnInitialUpdate()
 		if (FAILED(Texture_Manager::instance().InsertTexture(Texture_Manager::MULTI_TEX,
 			L"../Resource/Texture/Stage02/%d.png", L"Map", L"Stage2", 2)))
 			return;
+		/*if (FAILED(Texture_Manager::instance().InsertTexture(Texture_Manager::SINGLE_TEX,
+			L"../Resource/Texture/Item/%d.png", L"Item", L"Item1", 1)))
+			return;*/
 
 	}
 #pragma endregion _TEXTURE_LOAD_END

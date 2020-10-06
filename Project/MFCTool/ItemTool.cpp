@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "MFCToolView.h"
 #include "MainFrm.h"
+#include "Terrain.h"
 
 // CItemTool 대화 상자입니다.
 
@@ -17,7 +18,6 @@ CItemTool::CItemTool(CWnd* pParent /*=NULL*/)
 {
 	m_iDrawID = 0;
 
-	//EnableAutomation();
 
 }
 
@@ -29,108 +29,141 @@ CItemTool::~CItemTool()
 void CItemTool::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+
+	DDX_Control(pDX, IDC_LIST1, _ListBox);
+	DDX_Control(pDX, IDC_PICTURE, _Picture);
 }
 
 
 BEGIN_MESSAGE_MAP(CItemTool, CDialog)
+	ON_WM_DROPFILES()
 	ON_LBN_SELCHANGE(IDC_LIST1, &CItemTool::OnLbnSelchangeItemList1)
 END_MESSAGE_MAP()
 
 
 // CItemTool 메시지 처리기입니다.
+void CItemTool::OnDropFiles(HDROP hDropInfo)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	UpdateData(TRUE);
+	_ListBox.ResetContent();
+
+	TCHAR szFilePath[MAX_PATH] = L"";
+	TCHAR szFileName[MAX_PATH] = L"";
+	CString strReletivePath = L"";
+	int iSize = DragQueryFile(hDropInfo, -1, nullptr, 0);
+	CString strFileNameAndExtant = L"";
+	for (int i = 0; i < iSize; ++i)
+	{
+		DragQueryFile(hDropInfo, i, szFilePath, MAX_PATH);
+		strReletivePath = CFileInfo::ConvertReletivePath(szFilePath);
+		strFileNameAndExtant = PathFindFileName(strReletivePath);
+		lstrcpy(szFileName, strFileNameAndExtant.GetString());
+		PathRemoveExtension(szFileName);
+		m_ListBox.AddString(szFileName);
+
+	}
+
+	HorizontalScroll();
+	UpdateData(FALSE);
+	CDialog::OnDropFiles(hDropInfo);
+}
+
+
+void CItemTool::HorizontalScroll()
+{
+	CString Name;
+	CSize Size;
+	int CX = 0;
+	CDC* pDC = _ListBox.GetDC();
+
+	for (int i = 0; i < _ListBox.GetCount(); ++i)
+	{
+		_ListBox.GetText(i, Name);
+		Size = pDC->GetTextExtent(Name);
+
+		if (Size.cx > CX)
+			CX = Size.cx;
+	}
+
+	_ListBox.ReleaseDC(pDC);
+
+	if (CX > _ListBox.GetHorizontalExtent())
+	{
+		_ListBox.SetHorizontalExtent(CX);
+	}
+}
 
 
 void CItemTool::OnLbnSelchangeItemList1()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	constexpr float SelectPictureViewScale = 0.9f;
 
-	/*UpdateData(TRUE);
-	CString strFindName = L"";
-	int iIndex = m_ListBox.GetCurSel();
-	if (LB_ERR == iIndex)
+	auto* pView = GetView();
+	if (!pView)return;
+	if (!pView->up_Terrain)return;
+
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	CString CurrentSelectName = L"";
+	// 제로인덱스부터 시작하는 리스트 박스의 현재 선택한 인덱스입니다 (파일명과 혼동하지 마세요..)
+	int32_t SelectFileIndex = _ListBox.GetCurSel();
+	if (LB_ERR == SelectFileIndex)
 		return;
 
-	m_ListBox.GetText(iIndex, strFindName);
+	// 리스트박스의 현재선택 인덱스로부터 문자열을 얻어옵니다.
+	_ListBox.GetText(SelectFileIndex, CurrentSelectName);
 
-	int i = 0;
-	for (; i < strFindName.GetLength(); ++i)
+	// 파일명중 숫자만 남기기 위해 추적합니다.
+	int32_t i = CurrentSelectName.GetLength() - 1;
+	for (; i >= 0; --i)
 	{
-		if (isdigit(strFindName[i]))
+		if (false == isdigit(CurrentSelectName[i]))
 			break;
 	}
-	strFindName.Delete(0, i);
+	// 해당 작업 이후 파일명에서 숫자만 남습니다.
+	CurrentSelectName.Delete(0, i);
 
-	m_iDrawID = _wtoi(strFindName.GetString());
+	// 숫자 문자열을 실제 정수로 변환합니다.
+	_DrawID = _wtoi(CurrentSelectName.GetString());
 
-	UpdateData(FALSE);*/
+	GraphicDevice::instance().RenderBegin();
 
-	//constexpr float SelectPictureViewScale = 0.9f;
+	matrix MScale, MTranslation, MWorld;
+	auto sp_TexInfo = Texture_Manager::instance().
+		Get_TexInfo(L"Item", pView->up_Terrain->CurrentTileTextureStateKey, _DrawID);
 
-	//auto* pView = GetView();
-	//if (!pView)return;
-	//if (!pView->up_Terrain)return;
+	if (nullptr == sp_TexInfo)
+		return;
 
-	//// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	//UpdateData(TRUE);
-	//CString CurrentSelectName = L"";
-	//// 제로인덱스부터 시작하는 리스트 박스의 현재 선택한 인덱스입니다 (파일명과 혼동하지 마세요..)
-	//int32_t SelectFileIndex = _ListBox.GetCurSel();
+	float CenterX = sp_TexInfo->ImageInfo.Width >> 1;
+	float CenterY = sp_TexInfo->ImageInfo.Height >> 1;
 
-	//if (LB_ERR == SelectFileIndex)
-	//	return;
+	const float ClientSizeX = global::ClientSize.first;
+	const float ClientSizeY = global::ClientSize.second;
 
-	//// 리스트박스의 현재선택 인덱스로부터 문자열을 얻어옵니다.
-	//_ListBox.GetText(SelectFileIndex, CurrentSelectName);
+	D3DXMatrixTranslation(&MTranslation,
+		ClientSizeX* 0.5f,
+		ClientSizeY *0.5f, 0.f);
 
-	//// 파일명중 숫자만 남기기 위해 추적합니다.
-	//int32_t i = CurrentSelectName.GetLength() - 1;
-	//for (; i >= 0; --i)
-	//{
-	//	if (false == isdigit(CurrentSelectName[i]))
-	//		break;
-	//}
-	//// 해당 작업 이후 파일명에서 숫자만 남습니다.
-	//CurrentSelectName.Delete(0, i);
+	float SizeX = ClientSizeX / float(sp_TexInfo->ImageInfo.Width);
+	float SizeY = ClientSizeY / float(sp_TexInfo->ImageInfo.Height);
 
-	//// 숫자 문자열을 실제 정수로 변환합니다.
-	//_DrawID = _wtoi(CurrentSelectName.GetString());
+	D3DXMatrixScaling(&MScale, SizeX*SelectPictureViewScale, SizeY*SelectPictureViewScale, 0.f);
 
-	//GraphicDevice::instance().RenderBegin();
+	MWorld = MScale * MTranslation;
 
-	//matrix MScale, MTranslation, MWorld;
-	//auto sp_TexInfo = Texture_Manager::instance().
-	//	Get_TexInfo(L"Map", pView->up_Terrain->CurrentTileTextureStateKey, _DrawID);
+	auto& _GraphicDeviceRef = GraphicDevice::instance();
 
-	//if (nullptr == sp_TexInfo)
-	//	return;
+	_GraphicDeviceRef.GetSprite()->SetTransform(&MWorld);
 
-	//float CenterX = sp_TexInfo->ImageInfo.Width >> 1;
-	//float CenterY = sp_TexInfo->ImageInfo.Height >> 1;
+	_GraphicDeviceRef.instance().GetSprite()->Draw(sp_TexInfo->pTexture, nullptr,
+		&vec3(CenterX, CenterY, 0.f), nullptr, D3DCOLOR_ARGB(255, 255, 255, 255));
 
-	//const float ClientSizeX = global::ClientSize.first;
-	//const float ClientSizeY = global::ClientSize.second;
+	_GraphicDeviceRef.RenderEnd(_Picture.GetSafeHwnd());
 
-	//D3DXMatrixTranslation(&MTranslation,
-	//	ClientSizeX* 0.5f,
-	//	ClientSizeY *0.5f, 0.f);
-
-	//float SizeX = ClientSizeX / float(sp_TexInfo->ImageInfo.Width);
-	//float SizeY = ClientSizeY / float(sp_TexInfo->ImageInfo.Height);
-
-	//D3DXMatrixScaling(&MScale, SizeX*SelectPictureViewScale, SizeY*SelectPictureViewScale, 0.f);
-
-	//MWorld = MScale * MTranslation;
-
-	//auto& _GraphicDeviceRef = GraphicDevice::instance();
-
-	//_GraphicDeviceRef.GetSprite()->SetTransform(&MWorld);
-
-	//_GraphicDeviceRef.instance().GetSprite()->Draw(sp_TexInfo->pTexture, nullptr,
-	//	&vec3(CenterX, CenterY, 0.f), nullptr, D3DCOLOR_ARGB(255, 255, 255, 255));
-
-	//_GraphicDeviceRef.RenderEnd(_Picture.GetSafeHwnd());
-
-	//UpdateData(FALSE);
+	UpdateData(FALSE);
 }
 
 
@@ -143,3 +176,4 @@ CMFCToolView *  CItemTool::GetView() const &
 
 	return pView;
 }
+

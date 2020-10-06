@@ -31,6 +31,8 @@ public:
 	CListBox _ListBox;
 	CStatic _Picture;
 	int _DrawID{ 0 };
+	afx_msg void OnDropFiles(HDROP hDropInfo);
+	void HorizontalScroll();
 
 private:
 	class CMFCToolView*   GetView()const&;
