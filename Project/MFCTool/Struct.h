@@ -16,6 +16,15 @@ struct TexInfo
 	~TexInfo()noexcept{DXRelease(pTexture);}
 };
 
+typedef struct tagTexInfo
+{
+	// 이미지 한장을 제어하기 위한 컴객체. 예쩐에 쓰던 HBITMAP과 동일한 역할을 수행할 것. 
+	LPDIRECT3DTEXTURE9 pTexture;
+
+	// 이미지에 대한 정보를 담고 있을 구조체. 
+	D3DXIMAGE_INFO tImageInfo;
+}TEXINFO;
+
 // 맵 오브젝트들 그리는 순서 통제
 enum ELayer_Map  : int32_t
 {

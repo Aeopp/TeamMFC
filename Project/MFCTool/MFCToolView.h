@@ -4,7 +4,7 @@
 
 #pragma once
 
-
+class CGraphic_Device;
 
 #include "CollisionTileManager.h"
 #include "CollisionLineManager.h"
@@ -20,6 +20,8 @@ protected: // serialization에서만 만들어집니다.
 // 특성입니다.
 public:
 	class CMFCToolDoc* GetDocument() const;
+
+	CGraphic_Device* m_pGraphic_Device;
 
 // 작업입니다.
 public:

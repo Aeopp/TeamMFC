@@ -16,6 +16,7 @@
 #include "Single_Texture.h"
 #include "Texture_Manager.h"
 #include "Terrain.h"
+#include "Item.h"
 #include "MainFrm.h"
 #include "MiniView.h"
 #include "MyForm.h"
@@ -240,6 +241,13 @@ void CMFCToolView::OnInitialUpdate()
 			return;
 		if (FAILED(Texture_Manager::instance().InsertTexture(Texture_Manager::MULTI_TEX,
 			L"../Resource/Texture/Mansion/%d.png", L"Map", L"Mansion", 38)))
+			return;
+
+		if (FAILED(Texture_Manager::instance().InsertTexture(Texture_Manager::MULTI_TEX,
+			L"../Resource/Texture/Stage01/%d.png", L"Map", L"Stage1", 2)))
+			return;
+		if (FAILED(Texture_Manager::instance().InsertTexture(Texture_Manager::MULTI_TEX,
+			L"../Resource/Texture/Stage02/%d.png", L"Map", L"Stage2", 2)))
 			return;
 
 	}

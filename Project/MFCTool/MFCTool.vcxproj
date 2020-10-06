@@ -216,6 +216,8 @@
     <ClInclude Include="Function.h" />
     <ClInclude Include="Graphic_Device.h" />
     <ClInclude Include="Headers.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemTool.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MapTool.h" />
     <ClInclude Include="math.h" />
@@ -243,6 +245,8 @@
     <ClCompile Include="Define.cpp" />
     <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="Graphic_Device.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemTool.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MapTool.cpp" />
     <ClCompile Include="math.cpp" />
